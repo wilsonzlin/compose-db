@@ -1,0 +1,128 @@
+* {
+    box-sizing: border-box;
+}
+*:not(input):not(textarea) {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+body, button, input, select, textarea {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+flex {
+    align-items: center;
+    display: flex;
+}
+
+flex-spacer {
+    flex-grow: 1;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    padding: 0;
+}
+
+.block {
+    display: block;
+    width: 100%;
+}
+
+#app {
+    font-size: 14px;
+    color: #333;
+
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+#app > *:not(#databases) {
+    flex: 0 0 auto;
+}
+
+#databases {
+    flex-grow: 1;
+    overflow: auto;
+
+    padding: 20px;
+}
+
+#save-backdrop {
+    background-color: rgba(255, 255, 255, 0.7);
+    position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
+
+    overflow: auto;
+
+    display: none;
+}
+    #save-backdrop[data-visible="true"] {
+        display: flex;
+    }
+
+#save-modal {
+    background: white;
+    border: 2px solid #5aad35;
+    border-radius: 3px;
+    padding: 24px 18px;
+
+    margin: auto;
+    max-width: 100%;
+
+    width: 800px;
+}
+
+#save-modal-title {
+    font-weight: 500;
+    margin: 0 0 14px 0;
+}
+
+#save-modal-message {
+    margin: 0 0 18px 0;
+    color: #555;
+}
+
+#save-diff {
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px solid #555;
+    color: #888;
+    margin-bottom: 24px;
+    overflow: auto;
+}
+
+#save-diff > .added {
+    color: green;
+    font-weight: 700;
+}
+
+#save-diff > .removed {
+    color: red;
+    font-weight: 700;
+}
+
+#save-modal-buttons > .button {
+    margin-right: 12px;
+}
+
+<ZC-IMPORT[button]>
+<ZC-IMPORT[input]>
+
+
+<ZC-IMPORT[app/controls/base.css]>
+<ZC-IMPORT[app/sectioning/base.css]>
+<ZC-IMPORT[app/table/base.css]>
+<ZC-IMPORT[app/header/base.css]>
+<ZC-IMPORT[app/tabs/base.css]>
+<ZC-IMPORT[app/database/base.css]>

@@ -1,0 +1,174 @@
+.database {
+    width: 980px;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.database[data-hidden="true"] {
+    display: none;
+}
+
+.database[data-table-open="true"] .database-overview {
+    display: none;
+}
+
+.database-metadata {
+    border: 1px solid #ddd;
+    border-radius: 3px 3px 0 0;
+
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+.database-metadata > div {
+    display: table-cell;
+    padding: 10px 0;
+    /*color: #767676;*/
+
+    text-align: center;
+}
+
+.database-metadata > div > * {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.database-metadata i {
+    height: 20px;
+    width: 20px;
+    margin-right: 5px;
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+
+    opacity: 0.25;
+}
+
+.database-metadata em {
+    color: #333;
+    font-weight: 600;
+    font-style: normal;
+    margin-right: 4px;
+}
+
+.database-metadata span {
+    color: #999;
+}
+
+.database-ratio-container {
+    border-color: #ddd;
+    border-width: 0 1px 1px 1px;
+    border-style: solid;
+    border-radius: 0 0 3px 3px;
+
+    display: flex;
+    height: 10px;
+    overflow: hidden; /* Hide ratios overlapping curved borders */
+}
+
+.database-tables-ratio-fixed {
+    background: #0071ff;
+}
+
+.database-tables-ratio-instance {
+    background: #4afb00;
+}
+
+.database-details {
+    margin-top: 20px;
+}
+
+.database-details > * {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.database-details > .left {
+    width: calc(100% - 315px - 10px);
+    margin-right: 10px;
+}
+
+.database-details > .right {
+    width: 315px;
+}
+
+.database-controls {
+    margin-top: 12px;
+}
+
+.database-tables-widget > .top {
+    padding: 9px 10px 10px;
+
+    border: 1px solid #d8d8d8;
+    border-bottom: 0;
+    border-radius: 3px 3px 0 0;
+    background: #f5f5f5;
+
+    display: flex;
+    align-items: center;
+}
+
+.database-tables-widget > .top > .title {
+    font-weight: 600;
+}
+
+.database-tables-widget > .top > button {
+    float: right;
+}
+
+.database-tables-widget > .filters {
+    padding: 10px 10px 0 10px;
+
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+}
+
+.database-tables-widget > .filters > .groups {
+    margin-top: 6px;
+    text-align: center;
+}
+
+.database-tables-widget > .filters > .groups > .group > input {
+    display: none;
+}
+
+.database-tables-widget > .filters > .groups > .group > span {
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+
+    font-size: 12px;
+    color: #767676;
+
+    display: inline-block;
+    padding: 5px 5px 6px;
+    margin-right: 5px;
+}
+
+.database-tables-widget > .filters > .groups > .group > input:not(:checked) + span:hover {
+    border-bottom-color: #e5e5e5;
+}
+
+.database-tables-widget > .filters > .groups > .group > input:checked + span {
+    border-bottom-color: #d26911;
+    cursor: default;
+}
+
+.table-list-entry {
+    border-width: 0 1px 1px;
+    border-style: solid;
+    border-color: #d8d8d8;
+
+    color: #4078c0;
+    cursor: pointer;
+    font-weight: 600;
+    line-height: 33px;
+    padding: 0 6px 0 30px;
+}
+    .table-list-entry:hover {
+        text-decoration: underline;
+    }
+
+    .table-list-entry[data-hidden="true"] {
+        display: none;
+    }

@@ -1,0 +1,293 @@
+.database-table[data-hidden="true"] {
+    display: none;
+}
+
+.table-close-link {
+    background: none;
+    border: 0;
+    padding: 0;
+    outline: 0;
+
+    cursor: pointer;
+    color: #4078c0;
+    font-size: 14px;
+    font-weight: 600;
+
+    margin-bottom: 10px;
+}
+    .table-close-link:hover {
+        text-decoration: underline;
+    }
+
+.table-name-input {
+    border: 0;
+    padding: 5px;
+
+    display: block;
+
+    color: #333;
+    font-size: 35px;
+    font-weight: 500;
+}
+
+.table-action-label {
+    display: table;
+    table-layout: fixed;
+
+    width: 320px;
+}
+
+.table-action-label > * {
+    display: table-cell;
+    padding: 8px 8px 0 8px;
+    vertical-align: top;
+}
+    .table-action-label:last-child > * {
+        padding-bottom: 8px;
+    }
+
+.table-action-label > *:first-child {
+    font-size: 12px;
+    text-align: right;
+
+    border-right: 1px solid #ccc;
+    color: #666;
+    width: 90px;
+
+    padding-top: 12px;
+}
+
+.table-columns-actions {
+    margin: 25px 0 12px 0;
+}
+
+.table-columns-actions > .button-group-wrapper {
+    margin-right: 15px;
+}
+
+.table-indexes {
+    display: flex;
+    overflow: auto;
+
+    /* Use padding and margin so:
+        - top margin doesn't collapse
+        - margin still exists when scrollbar appears
+     */
+    padding: 8px 0 10px 0;
+    margin-bottom: 10px;
+}
+    .table-indexes:empty {
+        display: none;
+    }
+
+.table-index {
+    border-radius: 3px;
+    border: 1px solid #dfd8c2;
+
+    margin-right: 18px;
+    height: 150px;
+    width: 165px;
+    flex: 0 0 auto;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.table-index-head {
+    padding: 0 12px;
+    font-size: 13px;
+    background: #fff9ea;
+    border-bottom: 1px solid #dfd8c2;
+    color: #68777d;
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 32px;
+}
+    .table-index[data-columns-count="1"] .plural {
+        display: none;
+    }
+
+    .table-index-head .close-button-inline {
+        display: none;
+    }
+        .table-index:hover .close-button-inline {
+            display: block;
+        }
+
+.table-index-body {
+    padding: 12px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.table-index-type {
+    font-weight: 600;
+    font-size: 18px;
+    text-transform: uppercase;
+
+    color: #555;
+}
+
+.table-index-columns {
+    margin: 0 0 0 20px;
+    padding: 0;
+}
+
+.table-index-column {
+    display: block;
+    margin-top: 10px;
+
+    color: #767676;
+}
+
+.table-columns-head {
+    border-radius: 3px 3px 0 0;
+    border: 1px solid #c9e6f2;
+    background: #f2f9fc;
+    color: #68777d;
+
+    font-size: 13px;
+    padding: 10px;
+    line-height: 20px;
+}
+
+.table-columns-wrapper {
+    border-radius: 0 0 2px 2px;
+    border: 1px solid #ddd;
+    border-top: 0;
+}
+
+.table-column:not(:last-child) {
+    border-bottom: 1px solid #ddd;
+}
+
+.table-column-contraction:hover {
+    background: #f5f5f5;
+}
+
+.table-column-contraction td {
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+    .table-column-contraction td:first-child {
+        padding: 0 5px 0 10px;
+        width: 1px;
+    }
+    .table-column-contraction td:nth-child(2) {
+        width: 190px;
+    }
+    .table-column-contraction td:last-child {
+        padding-right: 6px;
+        text-align: right;
+        width: 110px;
+    }
+
+.table-column-contraction input, .table-column-contraction button {
+    display: block;
+    margin: 0;
+}
+
+.table-column-name,
+.table-column-comments {
+    width: 100%;
+}
+
+.table-column-checkbox {
+    margin: 0;
+}
+
+.table-column-name, .table-column-comments {
+    background: transparent;
+    border: 0;
+    margin: 0;
+    padding: 4px;
+
+    font-size: 14px;
+}
+
+.table-column-name {
+    color: #4078c0;
+}
+
+.table-column-comments {
+    color: #555;
+}
+
+.table-column-type {
+    color: #888;
+    text-transform: capitalize;
+    cursor: pointer;
+}
+    .table-column-type:hover {
+        text-decoration: underline;
+        color: #4078c0;
+    }
+
+.table-column-expand-arrow {
+    display: inline-block;
+    margin-left: 3px;
+}
+    .table-column[data-expanded="true"] .table-column-expand-arrow {
+        transform: rotate(180deg);
+    }
+
+.table-column-expansion {
+    display: table;
+    table-layout: fixed;
+
+    width: 550px;
+    max-width: 100%;
+    margin: 25px auto;
+}
+    .table-column[data-expanded="false"] .table-column-expansion {
+        display: none;
+    }
+
+.table-column-expansion > div {
+    display: table-row;
+}
+
+.table-column-expansion > div > * {
+    padding: 8px 15px;
+    display: table-cell;
+}
+
+.table-column-expansion dt {
+    text-align: right;
+    border-right: 1px solid #ccc;
+    color: #707070;
+}
+
+.table-code-column-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table-code-column-table th,
+.table-code-column-table td {
+    border: 1px solid #d8d8d8;
+    padding: 6px;
+}
+
+.table-code-column-table th {
+    background: #f5f5f5;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.table-code-column-value-button {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    height: 20px;
+    width: 20px;
+
+    outline: 0;
+    cursor: pointer;
+
+    display: block;
+}

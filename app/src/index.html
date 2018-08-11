@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>compose-db Schema</title>
+
+    <link rel="stylesheet" href="app.css">
+
+    <script src="lib/ooml.js"></script>
+    <script src="lib/diff.js"></script>
+
+    <script defer src="app.js"></script>
+</head>
+<body>
+    <ZC-IMPORT[app/controls/class.html]>
+    <ZC-IMPORT[app/table/class.html]>
+    <ZC-IMPORT[app/header/class.html]>
+    <ZC-IMPORT[app/tabs/class.html]>
+    <ZC-IMPORT[app/database/class.html]>
+
+    <template ooml-class="App">
+        <ooml-attribute name="currentSchema" type="string|null">null</ooml-attribute>
+        <ooml-attribute name="currentDatabase">null</ooml-attribute>
+
+        <ooml-property name="originalJSON">""</ooml-property>
+
+        <ooml-method name="changeSchema">
+            function(name) {
+                app.header.changeSaveButtonState(false);
+                app.header.changeDiscardButtonState(false);
+
+                fetch(location.origin + '/schema/' + name).then(res => res.text())
+                    .then(originalJSON => {
+                        let databases = JSON.parse(originalJSON);
+
+                        this.originalJSON = originalJSON;
+
+                        this.databases = [];
+                        this.databaseTabs.tabs = [];
+
+                        databases.forEach((db, idx) => {
+                            this.databases.push(Object.assign({}, db, {
+                                attributes: {
+                                    tabId: idx,
+                                },
+                            }));
+                            this.databaseTabs.addTab({
+                                icon: db.type == 'fixed' ? 'assets/database-blue.png' : 'assets/database-green.png',
+                                label: db.name,
+                                id: idx,
+                            });
+                        });
+
+                        this.header.changeSaveButtonState(true);
+                        this.header.changeDiscardButtonState(true);
+
+                        this.attributes.currentSchema = name;
+                        this.header.schemaPicker.value = name;
+                        history.replaceState(undefined, undefined, '#' + name);
+                    });
+            }
+        </ooml-method>
+
+        <ooml-method name="changeDatabase">
+            function(db) {
+                if (this.attributes.currentDatabase) {
+                    this.attributes.currentDatabase.attributes.hidden = true;
+                }
+                db.attributes.hidden = false;
+                this.attributes.currentDatabase = db;
+            }
+        </ooml-method>
+
+        <ooml-method name="getUnsavedChanges">
+            function() {
+                let diff = JsDiff.diffLines(this.originalJSON, this.databases.toJSON(undefined, undefined, 4));
+                if (diff.length &lt; 2) {
+                    return null;
+                }
+                return diff;
+            }
+        </ooml-method>
+
+        <div id="app">
+            <ooml-substitution property="header" class="AppHeader" suppressed
+                dispatchonchangeschema="
+                    if (data.name == this.attributes.currentSchema) {
+                        return;
+                    }
+
+                    if (this.attributes.currentSchema != null) {
+                        if (!confirm('You will lose any unsaved changes if you change schemas')) {
+                            this.header.schemaPicker.value = this.attributes.currentSchema;
+                            return;
+                        }
+                    }
+
+                    this.changeSchema(data.name);
+                "
+                dispatchonsavebuttonclick="
+                    let diff = this.getUnsavedChanges();
+                    if (!diff) {
+                        if (!confirm('You have made no changes, do you still want to save?')) {
+                            return;
+                        }
+                        this.$saveDiff.innerHTML = 'No changes';
+                    } else {
+                        this.$saveDiff.innerHTML = '';
+                        diff.forEach((part, partNo) => {
+                            let value = part.value;
+                            let isChange = part.added || part.removed;
+                            if (!isChange) {
+                                let valueLines = value.split(/[\r\n]+/);
+                                if (partNo == 0) {
+                                    valueLines = valueLines.slice(-5);
+                                } else if (partNo == diff.length - 1) {
+                                    valueLines = valueLines.slice(0, 5 + (valueLines[0] != ''));
+                                } else {
+                                    if (valueLines.length > 10) {
+                                        valueLines = valueLines.slice(0, 5).concat('\n=================== LINES SKIPPED ===================\n', valueLines.slice(-5));
+                                    }
+                                }
+                                value = valueLines.join('\n');
+                            }
+                            let span = document.createElement('span');
+                            if (isChange) {
+                                span.classList.add(part.added ? 'added' : 'removed');
+                            }
+                            span.textContent = value;
+                            this.$saveDiff.appendChild(span);
+                        });
+                    }
+                    this.$saveBackdrop.dataset.visible = true
+                "
+                dispatchondiscardbuttonclick="/* onbeforeunload will confirm */ location.reload(true)"
+            ></ooml-substitution>
+            <ooml-substitution property="databaseTabs" class="Tabs" suppressed
+                dispatchontabchange="this.changeDatabase(this.databases.find(db => db.attributes.tabId == data.id))"
+            ></ooml-substitution>
+            <div id="databases">
+                <ooml-substitution property="databases" class="Database" array
+                    dispatchondeletedatabase="
+                        if (confirm('Are you sure you want to delete this database?')) {
+                            this.attributes.currentDatabase.detach();
+                            this.attributes.currentDatabase = null;
+
+                            this.databaseTabs.attributes.activeTab.detach();
+                            this.databaseTabs.attributes.activeTab = null;
+                        }
+                    "
+                    dispatchonpopulatefkoptions="
+                        let options = [];
+                        this.databases.forEach(db => {
+
+                            db.tables.forEach(t => {
+                                let key = t.indexes.find(i => i.type == 'primary' && i.columns.length == 1);
+                                if (key) {
+                                    let columnName = key.columns.get(0).name;
+                                    let column = t.columns.find(c => c.name === columnName);
+
+                                    if (column.type == 'integer' || column.type == 'serial') {
+                                        let description = [];
+
+                                        description.push(column.size.name);
+                                        if (column.unsigned) {
+                                            description.push('UNSIGNED');
+                                        }
+                                        if (column.autoIncrement) {
+                                            description.push('AUTO_INCREMENT');
+                                        }
+
+                                        options.push({
+                                            name: `${db != data.database ? (db.name + '.') : ''}${t.name}.${columnName}`,
+                                            description: description.join(' '),
+                                        });
+                                    }
+                                }
+                            });
+
+                        });
+                        data.dropDown.options = options;
+                    "
+                ></ooml-substitution>
+            </div>
+
+            <div id="save-backdrop" ooml-expose="saveBackdrop">
+                <div id="save-modal">
+                    <h1 id="save-modal-title">Save changes</h1>
+                    <p id="save-modal-message">Here are the changes you have made:</p>
+                    <pre id="save-diff" ooml-expose="saveDiff"></pre>
+                    <div id="save-modal-buttons">
+                        <button class="button large positive" domonclick="
+                            let newJSON = this.databases.toJSON(undefined, undefined, 4);
+                            fetch(`${location.origin}/schema/${this.attributes.currentSchema}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: newJSON,
+                            })
+                                .then(() => {
+                                    this.originalJSON = newJSON;
+                                    this.$saveBackdrop.dataset.visible = false;
+                                })
+                                .catch(() => alert('Error'));
+                        ">Save</button>
+                        <button class="button large neutral" domonclick="this.$saveBackdrop.dataset.visible = false">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <div ooml-instantiate="App app">{
+        header: {},
+        databaseTabs: {},
+    }</div>
+</body>
+</html>

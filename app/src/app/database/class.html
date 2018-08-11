@@ -1,0 +1,142 @@
+<template ooml-class="DatabaseTablesListEntry">
+    <ooml-attribute name="hidden">false</ooml-attribute>
+    <ooml-attribute name="table">null</ooml-attribute>
+
+    <div class="table-list-entry" domonclick="dispatch('opentable', { table: this.attributes.table })">
+        {{ this.name }}
+    </div>
+</template>
+
+<template ooml-class="Database">
+    <ooml-attribute name="hidden">true</ooml-attribute>
+    <ooml-attribute name="currentTable">null</ooml-attribute>
+    <ooml-attribute name="currentTableNamesTypeFilter">"all"</ooml-attribute>
+    <ooml-attribute name="currentTableNamesSearchTerm">""</ooml-attribute>
+    <ooml-attribute name="fixedTablesCount">0</ooml-attribute>
+    <ooml-attribute name="instanceTablesCount">0</ooml-attribute>
+    <ooml-attribute name="tableOpen">false</ooml-attribute>
+    <ooml-attribute name="tabId">null</ooml-attribute>
+
+    <ooml-method name="openTable">
+        function(table) {
+            this.attributes.tableOpen = true;
+            if (this.attributes.currentTable) this.attributes.currentTable.attributes.hidden = true;
+            table.attributes.hidden = false;
+            this.attributes.currentTable = table;
+        }
+    </ooml-method>
+    <ooml-method name="closeTable">
+        function() {
+            this.attributes.tableOpen = false;
+            this.attributes.currentTable.attributes.hidden = true;
+            this.attributes.currentTable = null;
+            this.generateTableNames();
+            this.generateTableCounts();
+            this.filterTableNames();
+        }
+    </ooml-method>
+    <ooml-method name="createTable">
+        function() {
+            this.tables.push({});
+            this.openTable(this.tables.get(-1));
+        }
+    </ooml-method>
+    <ooml-method name="generateTableNames">
+        function() {
+            this.tableNames = this.tables.map(table => ({
+                attributes: {
+                    table: table,
+                },
+                name: table.name,
+            })).sort((a, b) => a.name &lt; b.name ? -1 : a.name > b.name ? 1 : 0);
+        }
+    </ooml-method>
+    <ooml-method name="generateTableCounts">
+        function() {
+            this.attributes.instanceTablesCount = this.tables.filter(table => table.type.value == 'instance').length;
+            this.attributes.fixedTablesCount = this.tables.length - this.attributes.instanceTablesCount;
+        }
+    </ooml-method>
+    <ooml-method name="filterTableNames">
+        function() {
+            this.tableNames.forEach(name => {
+                name.attributes.hidden = (this.attributes.currentTableNamesTypeFilter != 'all' && name.attributes.table.type.value != this.attributes.currentTableNamesTypeFilter) || (!!this.attributes.currentTableNamesSearchTerm && !RegExp(this.attributes.currentTableNamesSearchTerm, 'i').test(name.attributes.table.name));
+            });
+        }
+    </ooml-method>
+    <ooml-method name="constructor">
+        function() {
+            this.tables.on.mutation('arraychange', () => {
+                this.generateTableNames();
+                this.generateTableCounts();
+            });
+            this.generateTableNames();
+            this.generateTableCounts();
+        }
+    </ooml-method>
+
+    <div class="database">
+        <div class="database-overview">
+            <div class="database-metadata">
+                <div><i style="background-image: url(assets/business-card.png)"></i><em>{{ this.name }}</em></div>
+                <div><i style="background-image: url(assets/pin.png)"></i><em>{{ this.type }}</em><span>type</span></div>
+                <div><i style="background-image: url(assets/world.png)"></i><em>{{ this.charset }}</em><span>charset</span></div>
+                <div><i style="background-image: url(assets/language.png)"></i><em>{{ this.collation }}</em><span>collation</span></div>
+            </div>
+            <div class="database-ratio-container">
+                <div class="database-tables-ratio-fixed" style="flex-grow: {{ this.attributes.fixedTablesCount }}"></div>
+                <div class="database-tables-ratio-instance" style="flex-grow: {{ this.attributes.instanceTablesCount }}"></div>
+            </div>
+
+            <div class="database-details">
+                <div class="left">
+                    <span class="database-comments">
+                        <ooml-substitution property="comments" class="Control.TextArea.Seamless" passthrough="value">{
+                            attributes: {
+                                placeholder: "Comments",
+                            },
+                        }</ooml-substitution>
+                    </span>
+                    <div class="database-controls">
+                        <button class="button negative large" domonclick="dispatch('deletedatabase')">Delete database</button>
+                    </div>
+                </div>
+                <div class="right">
+                    <div class="database-tables-widget">
+                        <div class="top">
+                            <span class="title">Tables</span>
+                            <span class="tables-count"></span>
+                            <flex-spacer></flex-spacer>
+                            <button class="button positive" domonclick="this.createTable()">New table</button>
+                        </div>
+                        <div class="filters">
+                            <input class="search input block" placeholder="Find a table..." domoninput="this.attributes.currentTableNamesSearchTerm = $self.value.trim(); this.filterTableNames()">
+                            <div class="groups">
+                                <label class="group"><input name="database-tables-widget-tables-group-{{ this.attributes.tabId }}" type="radio" value="all" checked domonchange="if ($self.checked) { this.attributes.currentTableNamesTypeFilter = $self.value; this.filterTableNames(); }"><span>All</span></label>
+                                <label class="group"><input name="database-tables-widget-tables-group-{{ this.attributes.tabId }}" type="radio" value="fixed" domonchange="if ($self.checked) { this.attributes.currentTableNamesTypeFilter = $self.value; this.filterTableNames(); }"><span>Fixed</span></label>
+                                <label class="group"><input name="database-tables-widget-tables-group-{{ this.attributes.tabId }}" type="radio" value="instance" domonchange="if ($self.checked) { this.attributes.currentTableNamesTypeFilter = $self.value; this.filterTableNames(); }"><span>Instance</span></label>
+                            </div>
+                        </div>
+                        <div class="tables-list">
+                            <ooml-substitution property="tableNames" class="DatabaseTablesListEntry" suppressed array dispatchonopentable="this.openTable(data.table)"></ooml-substitution>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="database-tables">
+            <ooml-substitution property="tables" class="Table" array
+                dispatchonclosetable="this.closeTable()" dispatchondeletetable="
+                    if (confirm('Are you sure?')) {
+                        this.attributes.currentTable.detach();
+                        this.closeTable();
+                    }
+                "
+                dispatchonpopulatefkoptions="
+                    dispatch('populatefkoptions', { dropDown: data.dropDown, database: this });
+                "
+            ></ooml-substitution>
+        </div>
+    </div>
+</template>

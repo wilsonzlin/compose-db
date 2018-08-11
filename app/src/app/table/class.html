@@ -1,0 +1,585 @@
+<template ooml-abstract-class="TableColumn">
+    <ooml-attribute name="expanded" type="boolean">false</ooml-attribute>
+    <ooml-attribute name="checked" type="boolean">false</ooml-attribute>
+
+    <ooml-property name="name" type="string">""</ooml-property>
+    <ooml-property name="comments" type="string">""</ooml-property>
+
+    <ooml-method name="abstractFactory">
+        function(initState, classes) {
+            let type = initState.type[0].toUpperCase() + initState.type.slice(1);
+            return new classes['Table' + type + 'Column'](initState);
+        }
+    </ooml-method>
+
+    <ooml-tbody class="table-column">
+        <ooml-tr class="table-column-contraction">
+            <ooml-td><input class="table-column-checkbox" type="checkbox" domonchange="this.attributes.checked = $self.checked"></ooml-td>
+            <ooml-td><input class="table-column-name" value="{{ this.name }}" placeholder="Name" domonchange="this.name = $self.value = $self.value.trim()"></ooml-td>
+            <ooml-td><input class="table-column-comments" value="{{ this.comments }}" placeholder="Comments" domonchange="this.comments = $self.value = $self.value.trim()"></ooml-td>
+            <ooml-td class="table-column-type" domonclick="this.attributes.expanded = !this.attributes.expanded">
+                {{ this.type }} <span class="table-column-expand-arrow">&#9660;</span>
+            </ooml-td>
+        </ooml-tr>
+        <ooml-tr>
+            <ooml-td colspan="4">
+                <ooml-extension-point></ooml-extension-point>
+            </ooml-td>
+        </ooml-tr>
+    </ooml-tbody>
+</template>
+
+<template ooml-class="TableFKColumn extends TableColumn">
+    <ooml-property name="type">"FK"</ooml-property>
+
+    <dl class="table-column-expansion">
+        <div>
+            <dt>Column</dt>
+            <dd>
+                <ooml-substitution property="column" class="Control.DropDown.Extended" passthrough="value"
+                    dispatchonopen="dispatch('populatefkoptions', { dropDown: this.column });"
+                >{
+                    attributes: { nullOnUnknown: false }
+                }</ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>On delete</dt>
+            <dd>
+                <ooml-substitution property="ondelete" class="Control.DropDown.Extended" passthrough="value"
+                    dispatchonchange="if (this.ondelete.value == 'SET NULL') this.nullable.checked = true"
+                >{
+                    value: 'NO ACTION',
+                    options: [
+                        { name: 'Cascade', description: 'Also delete this row', value: 'CASCADE' },
+                        { name: 'Nullify', description: 'Make this value NULL', value: 'SET NULL' },
+                        { name: 'Do nothing', description: 'Stay put', value: 'NO ACTION' },
+                    ],
+                }</ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Default value</dt>
+            <dd>
+                <ooml-substitution property="defaultValue" class="Control.Input.Integer.Optional" passthrough="value"></ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Nullable</dt>
+            <dd>
+                <ooml-substitution property="nullable" class="Control.Checkbox" passthrough="checked"></ooml-substitution>
+            </dd>
+        </div>
+    </dl>
+</template>
+
+<template ooml-class="TableIntegerColumn extends TableColumn">
+    <ooml-property name="type">"integer"</ooml-property>
+
+    <ooml-method name="validateDefaultValue">
+        function() {
+            if (this.unsigned.checked && this.defaultValue.value &lt; 0) {
+                this.defaultValue = 0
+            }
+        }
+    </ooml-method>
+
+    <dl class="table-column-expansion">
+        <div>
+            <dt>Size</dt>
+            <dd>
+                <ooml-substitution property="size" class="Control.DropDown.Extended" passthrough="value">{
+                    options: [
+                        { name: 'TINYINT', description: '1 byte; -128 to +127 (signed)\nor up to 255 (unsigned)', value: 'TINYINT' },
+                        { name: 'SMALLINT', description: '2 bytes; -32,768 to +32,767 (signed)\nor up to 65,535 (unsigned)', value: 'SMALLINT' },
+                        { name: 'MEDIUMINT', description: '3 bytes; -8 million to +8 million (signed)\nor up to 16 million (unsigned)', value: 'MEDIUMINT' },
+                        { name: 'INT', description: '4 bytes; -2 billion to +2 billion (signed)\nor up to 4 billion (unsigned)', value: 'INT' },
+                        { name: 'BIGINT', description: '8 bytes; -9 quintillion to +9 quintillion (signed)\nor up to 18 quintillion (unsigned)', value: 'BIGINT' },
+                    ],
+                }</ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Unsigned</dt>
+            <dd>
+                <ooml-substitution property="unsigned" class="Control.Checkbox" passthrough="checked" dispatchonchange="this.validateDefaultValue()"></ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Minimum value</dt>
+            <dd>
+                <ooml-substitution property="minValue" class="Control.Input.Integer.Optional" passthrough="value" dispatchonchange="this.validateDefaultValue()"></ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Maximum value</dt>
+            <dd>
+                <ooml-substitution property="maxValue" class="Control.Input.Integer.Optional" passthrough="value" dispatchonchange="this.validateDefaultValue()"></ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Default value</dt>
+            <dd>
+                <ooml-substitution property="defaultValue" class="Control.Input.Integer.Optional" passthrough="value" dispatchonchange="this.validateDefaultValue()"></ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Nullable</dt>
+            <dd>
+                <ooml-substitution property="nullable" class="Control.Checkbox" passthrough="checked"></ooml-substitution>
+            </dd>
+        </div>
+    </dl>
+</template>
+
+<template ooml-class="TableSerialColumn extends TableColumn">
+    <ooml-property name="type">"serial"</ooml-property>
+
+    <dl class="table-column-expansion">
+        <div>
+            <dt>Size</dt>
+            <dd>
+                <ooml-substitution property="size" class="Control.DropDown.Extended" passthrough="value">{
+                    options: [
+                        { name: 'TINYINT', description: '1 byte; up to 255', value: 'TINYINT' },
+                        { name: 'SMALLINT', description: '2 bytes; up to 65,535', value: 'SMALLINT' },
+                        { name: 'MEDIUMINT', description: '3 bytes; up to 16 million', value: 'MEDIUMINT' },
+                        { name: 'INT', description: '4 bytes; up to 4 billion', value: 'INT' },
+                        { name: 'BIGINT', description: '8 bytes; up to 18 quintillion', value: 'BIGINT' },
+                    ],
+                }</ooml-substitution>
+            </dd>
+        </div>
+    </dl>
+</template>
+
+<template ooml-class="TableTimestampColumn extends TableColumn">
+    <ooml-property name="type">"timestamp"</ooml-property>
+
+    <ooml-method name="validateDefaultValue">
+        function() {
+            if (this.unsigned.checked && this.defaultValue.value &lt; 0) {
+                this.defaultValue = 0
+            }
+        }
+    </ooml-method>
+
+    <dl class="table-column-expansion">
+        <div>
+            <dt>Unsigned</dt>
+            <dd>
+                <ooml-substitution property="unsigned" class="Control.Checkbox" passthrough="checked">{ checked: true }</ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Default value</dt>
+            <dd>
+                <ooml-substitution property="defaultValue" class="Control.Input.Integer.Optional" passthrough="value" dispatchonchange="this.validateDefaultValue()"></ooml-substitution>
+            </dd>
+        </div>
+    </dl>
+</template>
+
+<template ooml-class="TableStringColumn extends TableColumn">
+    <ooml-property name="type">"string"</ooml-property>
+
+    <dl class="table-column-expansion">
+        <div>
+            <dt>Minimum length</dt>
+            <dd>
+                <ooml-substitution property="minLength" class="Control.Input.Integer.Optional" passthrough="value">{
+                    attributes: {
+                        min: 0,
+                        max: 1024,
+                    }
+                }</ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Maximum length</dt>
+            <dd>
+                <ooml-substitution property="maxLength" class="Control.Input.Integer.Optional" passthrough="value">{
+                    attributes: {
+                        min: 1,
+                        max: 1024,
+                    }
+                }</ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Matches regular expression</dt>
+            <dd>
+                <ooml-substitution property="regexpMatch" class="Control.Input.RegExp" passthrough="value"></ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Does not match regular expression</dt>
+            <dd>
+                <ooml-substitution property="regexpNotMatch" class="Control.Input.RegExp" passthrough="value"></ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Default value</dt>
+            <dd>
+                <ooml-substitution property="defaultValue" class="Control.Input.TrimmableText.Optional" passthrough="value"></ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Nullable</dt>
+            <dd>
+                <ooml-substitution property="nullable" class="Control.Checkbox" passthrough="checked"></ooml-substitution>
+            </dd>
+        </div>
+    </dl>
+</template>
+
+<template ooml-class="TableBinaryColumn extends TableColumn">
+    <ooml-property name="type">"binary"</ooml-property>
+
+    <dl class="table-column-expansion">
+        <div>
+            <dt>Minimum size</dt>
+            <dd>
+                <ooml-substitution property="minSize" class="Control.Input.Integer.Optional" passthrough="value">{
+                    attributes: {
+                        min: 0,
+                        max: 1024,
+                    }
+                }</ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Maximum size</dt>
+            <dd>
+                <ooml-substitution property="maxSize" class="Control.Input.Integer.Optional" passthrough="value">{
+                    attributes: {
+                        min: 1,
+                        max: 1024,
+                    }
+                }</ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Default value ("literal" or 0xb45316)</dt>
+            <dd>
+                <ooml-substitution property="defaultValue" class="Control.Input.TrimmableText.Optional" passthrough="value"></ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Nullable</dt>
+            <dd>
+                <ooml-substitution property="nullable" class="Control.Checkbox" passthrough="checked"></ooml-substitution>
+            </dd>
+        </div>
+    </dl>
+</template>
+
+<template ooml-class="TableBooleanColumn extends TableColumn">
+    <ooml-property name="type">"boolean"</ooml-property>
+
+    <dl class="table-column-expansion">
+        <div>
+            <dt>Default value (0 or 1)</dt>
+            <dd>
+                <ooml-substitution property="defaultValue" class="Control.Input.Integer.Optional" passthrough="value">{
+                    attributes: {
+                        min: 0,
+                        max: 1,
+                    },
+                }</ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Nullable</dt>
+            <dd>
+                <ooml-substitution property="nullable" class="Control.Checkbox" passthrough="checked"></ooml-substitution>
+            </dd>
+        </div>
+    </dl>
+</template>
+
+<template ooml-class="TableCodeColumnValue">
+    <ooml-tr>
+        <ooml-td style="width: 1px"><ooml-substitution property="code" class="Control.Input.Integer" passthrough="value">{ attributes: { small: true, min: 0, arrows: false } }</ooml-substitution></ooml-td>
+        <ooml-td><ooml-substitution property="value" class="Control.Input.TrimmableText" passthrough="value">{ attributes: { small: true, color: "blue" } }</ooml-substitution></ooml-td>
+        <ooml-td>
+            <button class="table-code-column-value-button" style="font-size: 32px; line-height: 38px" domonclick="dispatch('moveup', { what: this })">˄</button>
+            <button class="table-code-column-value-button" style="font-size: 32px; line-height: 38px" domonclick="dispatch('movedown', { what: this })">˅</button>
+            <button class="table-code-column-value-button" style="font-size: 17px" domonclick="dispatch('add', { below: this })">&#10133;</button>
+            <button class="table-code-column-value-button" style="font-size: 18px; line-height: 20px" domonclick="dispatch('delete', { what: this })">✕</button>
+        </ooml-td>
+    </ooml-tr>
+</template>
+
+<template ooml-class="TableCodeColumn extends TableColumn">
+    <ooml-property name="type">"code"</ooml-property>
+
+    <dl class="table-column-expansion">
+        <div>
+            <dt>Values</dt>
+            <dd>
+                <ooml-table class="table-code-column-table">
+                    <ooml-thead>
+                        <ooml-tr>
+                            <ooml-th>Code</ooml-th>
+                            <ooml-th>Value</ooml-th>
+                            <ooml-th></ooml-th>
+                        </ooml-tr>
+                    </ooml-thead>
+
+                    <ooml-tbody>
+                        <ooml-substitution property="values" class="TableCodeColumnValue" array
+                            dispatchonmoveup="let idx = this.values.indexOf(data.what); if (idx != 0) { data.what.detach(); this.values.splice(idx - 1, 0, data.what); }"
+                            dispatchonmovedown="let idx = this.values.indexOf(data.what); if (idx != this.values.length - 1) { data.what.detach(); this.values.splice(idx + 1, 0, data.what); }"
+                            dispatchonadd="this.values.splice(this.values.indexOf(data.below) + 1, 0, {})"
+                            dispatchondelete="this.values.splice(this.values.indexOf(data.what), 1)"
+                        >[{}]</ooml-substitution>
+                    </ooml-tbody>
+                </ooml-table>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Default value</dt>
+            <dd>
+                <ooml-substitution property="defaultValue" class="Control.Input.Integer.Optional" passthrough="value"></ooml-substitution>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Nullable</dt>
+            <dd>
+                <ooml-substitution property="nullable" class="Control.Checkbox" passthrough="checked"></ooml-substitution>
+            </dd>
+        </div>
+    </dl>
+</template>
+
+<template ooml-class="TableIndexColumn">
+    <ooml-property name="name" type="string">""</ooml-property>
+
+    <ooml-method name="serialise">
+        function() {
+            return this.name;
+        }
+    </ooml-method>
+    <ooml-method name="unserialise">
+        function(name) {
+            return {
+                name: name,
+            };
+        }
+    </ooml-method>
+
+    <li class="table-index-column">{{ this.name }}</li>
+</template>
+
+<template ooml-class="TableIndex">
+    <ooml-attribute name="columnsCount" type="natural">0</ooml-attribute>
+
+    <ooml-method name="constructor">
+        function() {
+            this.attributes.columnsCount = this.columns.length;
+        }
+    </ooml-method>
+
+    <div class="table-index">
+        <div class="table-index-head">
+            <span>{{ this.attributes.columnsCount }} column<span class="plural">s</span></span>
+            <button class="close-button-inline" domonclick="this.detach()"></button>
+        </div>
+        <div class="table-index-body">
+            <div class="table-index-type">{{ this.type }}</div>
+            <ul class="table-index-columns"><ooml-substitution property="columns" class="TableIndexColumn" array></ooml-substitution></ul>
+        </div>
+    </div>
+</template>
+
+<template ooml-class="Table">
+    <ooml-attribute name="hidden">true</ooml-attribute>
+    <ooml-attribute name="columnsCount">0</ooml-attribute>
+
+    <ooml-property type="string" name="name">""</ooml-property>
+
+    <ooml-method name="constructor">
+        function() {
+            this.columns.on.mutation('arraychange', () => {
+                this.attributes.columnsCount = this.columns.length;
+            });
+            this.attributes.columnsCount = this.columns.length;
+        }
+    </ooml-method>
+
+    <div class="database-table">
+        <flex>
+            <div>
+                <button class="table-close-link" domonclick="
+                    if (!this.name) {
+                        alert('Enter a name');
+                        return;
+                    }
+                    dispatch('closetable');
+                ">&#171; Return to database</button>
+                <input class="table-name-input" value="{{ this.name }}" domonchange="this.name = $self.value = $self.value.trim()" placeholder="(Table name)">
+            </div>
+            <flex-spacer></flex-spacer>
+            <div class="boxed-group" data-group-name="Settings">
+                <div class="table-action-label">
+                    <span>Type</span>
+                    <span><ooml-substitution property="type" class="Control.DropDown.Extended" passthrough="value">{
+                        attributes: {
+                            popupAlignment: 'right',
+                        },
+                        options: [
+                            { name: 'Fixed', description: 'This table always exists', value: 'fixed' },
+                            { name: 'Instance', description: 'This table is dynamically created', value: 'instance' }
+                        ],
+                        value: 'fixed',
+                    }</ooml-substitution></span>
+                </div>
+                <div class="table-action-label">
+                    <span>Comments</span>
+                    <span><ooml-substitution property="comments" class="Control.TextArea.Seamless" passthrough="value">{
+                        attributes: {
+                            placeholder: 'No comment',
+                            fontSize: 12,
+                        },
+                    }</ooml-substitution></span>
+                </div>
+                <div class="table-action-label">
+                    <span>Actions</span>
+                    <span>
+                        <button class="button negative" domonclick="dispatch('deletetable')">Delete table</button>
+                    </span>
+                </div>
+            </div>
+        </flex>
+
+        <flex class="table-columns-actions">
+            <div class="button-group-wrapper">
+                <button class="button neutral" domonclick="this.columns.forEach((col, pos) => {
+                    if (col.attributes.checked && pos) {
+                        col.detach();
+                        this.columns.splice(pos - 1, 0, col);
+                    }
+                })">Move up</button>
+                <button class="button neutral" domonclick="this.columns.slice().reverse().forEach((col, pos) => {
+                    if (col.attributes.checked && pos) {
+                        col.detach();
+                        /* WARNING: .detach() changes this.columns.length */
+                        this.columns.splice(this.columns.length - pos + 1, 0, col);
+                    }
+                })">Move down</button>
+                <button class="button neutral" domonclick="this.columns.filter(col => col.attributes.checked).forEach(col => col.detach())">Delete</button>
+            </div>
+            <div class="button-group-wrapper">
+                <button class="button neutral" domonclick="
+                    if (this.indexes.find(i => i.type == 'primary')) {
+                        alert('A primary key already exists');
+                        return;
+                    }
+
+                    let checked = this.columns.filter(col => col.attributes.checked);
+                    if (!checked.length) {
+                        alert('Choose at least one column for a primary key');
+                        return;
+                    }
+
+                    if (this.indexes.some(i => i.columns.some(c => checked.some(chk => chk.name === c.name)))) {
+                        alert('An index already exists with a chosen column');
+                        return;
+                    }
+
+                    this.indexes.unshift({
+                        type: 'primary',
+                        columns: checked.map(col => col.name),
+                    })
+                ">Primary Key</button>
+                <button class="button neutral" domonclick="
+                    let checked = this.columns.filter(col => col.attributes.checked);
+                    if (!checked.length) {
+                        alert('Choose at least one column for a unique index');
+                        return;
+                    }
+
+                    if (this.indexes.some(i => i.columns.some(c => checked.some(chk => chk.name === c.name)))) {
+                        alert('An index already exists with a chosen column');
+                        return;
+                    }
+
+                    this.indexes.push({
+                        type: 'unique',
+                        columns: checked.map(col => col.name),
+                    })
+                ">Unique</button>
+                <button class="button neutral" domonclick="
+                    let checked = this.columns.filter(col => col.attributes.checked);
+                    if (checked.length !== 1) {
+                        alert('Choose one column to index');
+                        return;
+                    }
+
+                    if (this.indexes.some(i => i.columns.some(c => c.name === checked[0].name))) {
+                        alert('An index already exists with that column');
+                        return;
+                    }
+
+                    this.indexes.push({
+                        type: 'index',
+                        columns: checked.map(col => col.name),
+                    })
+                ">Index</button>
+            </div>
+            <flex-spacer></flex-spacer>
+            <div>
+                <div class="dropdown">
+                    <button class="button positive" domonclick="$self.parentNode.classList.toggle('open')">Add column</button>
+                    <ul>
+                        <li domonclick="this.columns.push(new classes.TableFKColumn)">Foreign Key</li>
+                        <li domonclick="this.columns.push(new classes.TableIntegerColumn)">Integer</li>
+                        <li domonclick="this.columns.push(new classes.TableSerialColumn)">Serial</li>
+                        <li domonclick="this.columns.push(new classes.TableTimestampColumn)">Timestamp</li>
+                        <li domonclick="this.columns.push(new classes.TableStringColumn)">String</li>
+                        <li domonclick="this.columns.push(new classes.TableBinaryColumn)">Binary</li>
+                        <li domonclick="this.columns.push(new classes.TableBooleanColumn)">Boolean</li>
+                        <li domonclick="this.columns.push(new classes.TableCodeColumn)">Code</li>
+                    </ul>
+                </div>
+            </div>
+        </flex>
+
+        <div class="table-indexes">
+            <ooml-substitution property="indexes" class="TableIndex" array></ooml-substitution>
+        </div>
+
+        <div class="table-columns-head">
+            {{ this.attributes.columnsCount }} columns
+        </div>
+
+        <div class="table-columns-wrapper">
+            <ooml-table class="table-columns">
+                <ooml-substitution property="columns" class="TableColumn" array dispatchonpopulatefkoptions="
+                    dispatch('populatefkoptions', data);
+                "></ooml-substitution>
+            </ooml-table>
+        </div>
+    </div>
+</template>

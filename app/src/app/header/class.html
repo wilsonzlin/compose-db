@@ -1,0 +1,27 @@
+<template ooml-class="AppHeader">
+    <ooml-method name="changeSaveButtonState">
+        function(state) {
+            this.$saveButton.disabled = !state;
+        }
+    </ooml-method>
+    <ooml-method name="changeDiscardButtonState">
+        function(state) {
+            this.$discardButton.disabled = !state;
+        }
+    </ooml-method>
+
+    <div id="header">
+        <div id="header-logo">
+            <span id="header-logo-org">compose-db</span>
+            <span id="header-logo-schema">Schema</span>
+        </div>
+
+        <div id="header-controls">
+            <ooml-substitution property="schemaPicker" class="Control.DropDown.Extended" suppressed
+                dispatchonchange="dispatch('changeschema', { name: this.schemaPicker.value })"
+            >{ attributes: { popupAlignment: 'right' } }</ooml-substitution>
+            <button ooml-expose="discardButton" domonclick="dispatch('discardButtonClick')" class="button large neutral"  disabled>Discard</button>
+            <button ooml-expose="saveButton"    domonclick="dispatch('saveButtonClick')"    class="button large positive" disabled>Save</button>
+        </div>
+    </div>
+</template>

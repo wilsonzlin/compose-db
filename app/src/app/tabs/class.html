@@ -1,0 +1,32 @@
+<template ooml-class="Tab">
+    <ooml-attribute name="active">false</ooml-attribute>
+    <ooml-property name="id">null</ooml-property>
+
+    <div class="tab" domonclick="dispatch('click', { tab: this })">
+        <div class="tab-icon" style="background-image: url({{ this.icon }})"></div>
+        <div class="tab-label">{{ this.label }}</div>
+    </div>
+</template>
+
+<template ooml-class="Tabs">
+    <ooml-attribute name="activeTab">null</ooml-attribute>
+
+    <ooml-method name="addTab">
+        function(newTab) {
+            this.tabs.push(newTab);
+        }
+    </ooml-method>
+    <ooml-method name="switchToTab">
+        function(tab) {
+            if (this.attributes.activeTab) {
+                this.attributes.activeTab.attributes.active = false;
+            }
+            tab.attributes.active = true;
+            this.attributes.activeTab = tab
+        }
+    </ooml-method>
+
+    <div class="tabs">
+        <ooml-substitution property="tabs" class="Tab" array dispatchonclick="this.switchToTab(data.tab); dispatch('tabchange', { id: data.tab.id })"></ooml-substitution>
+    </div>
+</template>

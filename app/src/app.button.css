@@ -1,0 +1,215 @@
+.button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: 600;
+
+    cursor: pointer;
+    outline: 0;
+
+    border-radius: 3px;
+    border-width: 1px;
+    border-style: solid;
+
+    padding: 3px 10px;
+}
+    .button.large {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+    .button:disabled {
+        cursor: default;
+    }
+
+    .button-group-wrapper > .button:first-child,
+    .button-group-start {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    .button-group-wrapper > .button:not(:first-child):not(:last-child),
+    .button-group-middle {
+        border-radius: 0;
+        border-left: 0;
+    }
+    .button-group-wrapper > .button:last-child,
+    .button-group-end {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left: 0;
+    }
+
+    .dropdown {
+        position: relative;
+    }
+
+    .dropdown > .button::after {
+        display: inline-block;
+        width: 0;
+        height: 0;
+
+        margin-left: 2px;
+        vertical-align: -2px;
+
+        content: '';
+
+        border: 4px solid;
+        border-right-color: transparent;
+        border-bottom-color: transparent;
+        border-left-color: transparent;
+    }
+        .dropdown > .button.large::after {
+            margin-left: 4px;
+        }
+    .dropdown > ul {
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 4px;
+        background: white;
+
+        display: none;
+
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+
+        min-width: 180px;
+        padding: 4px 0;
+        margin: 0;
+    }
+        .dropdown.open > ul {
+            display: block;
+            z-index: 10;
+        }
+    .dropdown > ul::before {
+        content: '';
+        border: 8px solid transparent;
+        border-bottom-color: rgba(0, 0, 0, 0.15);
+
+        top: -16px;
+        right: 9px;
+
+        position: absolute;
+        display: block;
+    }
+    .dropdown > ul::after {
+        content: '';
+        border: 7px solid transparent;
+        border-bottom-color: #fff;
+
+        top: -14px;
+        right: 10px;
+
+        position: absolute;
+        display: block;
+    }
+    .dropdown > ul > li {
+        padding: 4px 15px;
+        cursor: pointer;
+        display: block;
+
+        color: #333;
+        line-height: 21px;
+    }
+    .dropdown > ul > li:hover {
+        background: #4078c0;
+        color: white;
+    }
+
+.button.positive {
+    background: linear-gradient(#91dd70, #55ae2e);
+    border-color: #5aad35;
+
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.15);
+    color: white;
+}
+
+    .button.positive:hover {
+        background: linear-gradient(#85d063, #4f992f);
+        border-color: #519d30;
+    }
+
+    .button.positive:active {
+        background: #4b912c;
+        border-color: #417e26;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    .button.positive:disabled {
+        background: linear-gradient(#c4e8b4, #a7d892);
+        border-color: #a7dd8f;
+
+        color: white;
+    }
+
+.button.neutral {
+    background: linear-gradient(#fcfcfc, #eee);
+    border-color: #d5d5d5;
+
+    color: #333;
+}
+
+    .button.neutral:hover {
+        background: linear-gradient(#eee, #ddd);
+        border-color: #ccc;
+    }
+
+    .button.neutral:active {
+        background: #dcdcdc;
+        border-color: #b5b5b5;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    .button.neutral:disabled {
+        background: rgba(229, 229, 229, 0.5);
+        border-color: rgba(197, 197, 197, 0.5);
+
+        color: rgba(102, 102, 102, 0.5);
+    }
+
+.button.negative {
+    background: linear-gradient(#fcfcfc, #eee);
+    border-color: #d5d5d5;
+
+    color: #911;
+}
+    .button.negative:hover {
+        background: linear-gradient(#ec5757, #c71616);
+        border-color: #911;
+
+        color: white;
+    }
+    .button.negative:active {
+        background: #820e0e;
+        border-color: #740d0d;
+
+        color: white;
+    }
+    .button.negative:disabled {
+        background: linear-gradient(#fefefe, #efefef);
+        border-color: #e1e1e1;
+
+        color: #cc8888;
+    }
+
+.close-button-inline {
+    background: transparent;
+    height: 16px;
+    padding: 0;
+    border: 0;
+
+    color: #ccc;
+    cursor: pointer;
+    line-height: 0;
+    font-size: 22px;
+}
+
+.close-button-inline::after {
+    content: '\00D7';
+}
+
+.close-button-inline:hover {
+    color: #555;
+}

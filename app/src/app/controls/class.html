@@ -1,0 +1,288 @@
+<template ooml-class="Control.DropDown.Extended.Option">
+    <ooml-attribute name="selected">false</ooml-attribute>
+
+    <ooml-property name="value">null</ooml-property>
+
+    <div class="control-dropdown-extended-option" domonclick="dispatch('click', { option: this })">
+        <div class="control-dropdown-extended-option-name">{{ this.name }}</div>
+        <div class="control-dropdown-extended-option-description">{{ this.description }}</div>
+    </div>
+</template>
+
+<template ooml-class="Control.DropDown.Extended">
+    <ooml-attribute name="open" change="dispatch(value ? 'open' : 'close')">false</ooml-attribute>
+    <ooml-attribute name="nullOnUnknown" type="boolean">true</ooml-attribute>
+    <ooml-attribute name="selectedOption">null</ooml-attribute>
+    <ooml-attribute name="forcedOption">false</ooml-attribute>
+    <ooml-attribute name="popupAlignment">"left"</ooml-attribute>
+    <ooml-attribute name="setValueSetTimeout">null</ooml-attribute>
+    <ooml-attribute name="init">true</ooml-attribute>
+
+    <ooml-property name="value"
+        get="
+            if (this.attributes.forcedOption) {
+                return this.attributes.selectedOption;
+            }
+            if (!this.attributes.selectedOption) {
+                return null;
+            }
+            if (this.attributes.selectedOption.value === null) {
+                return this.attributes.selectedOption.name;
+            }
+            return this.attributes.selectedOption.value;
+        "
+
+        set="
+            clearTimeout(this.attributes.setValueSetTimeout);
+            this.attributes.setValueSetTimeout = setTimeout(() => {
+
+                let newOption = newValue instanceof classes['Control.DropDown.Extended.Option'] ? newValue : (this.options.find(opt => opt.value === newValue) || null);
+
+                let oldOption = this.attributes.selectedOption;
+
+                let forceUnknown = !this.attributes.nullOnUnknown && !newOption;
+
+                this.setOption(newOption);
+                if (forceUnknown) {
+                    this.attributes.selectedOption = this.$button.textContent = newValue;
+                    this.attributes.forcedOption = true;
+                }
+
+                if (this.attributes.init) {
+                    this.attributes.init = false;
+                } else if (forceUnknown || oldOption !== newOption) {
+                    dispatch('change');
+                }
+
+            }, 100);
+
+            return false;
+        "
+    >null</ooml-property>
+
+    <ooml-method name="setOption">
+        function(option) {
+            if (this.attributes.selectedOption && !this.attributes.forcedOption) {
+                this.attributes.selectedOption.attributes.selected = false;
+            }
+
+            this.attributes.selectedOption = option;
+            this.attributes.forcedOption = false;
+
+            if (option) {
+                option.attributes.selected = true;
+                this.$button.textContent = option.name;
+            } else {
+                this.$button.textContent = '';
+            }
+        }
+    </ooml-method>
+
+    <ooml-method name="serialise">
+        function() {
+            return this.value;
+        }
+    </ooml-method>
+    <ooml-method name="unserialise">
+        function(val) {
+            return {
+                value: val,
+            };
+        }
+    </ooml-method>
+
+    <div class="control-dropdown-extended-container dropdown">
+        <button ooml-expose="button" class="control-dropdown-extended-button button neutral" domonclick="this.attributes.open = !this.attributes.open"></button>
+        <div class="control-dropdown-extended-popup" style="{{ this.attributes.popupAlignment }}: 0">
+            <div class="control-dropdown-extended-popup-head">
+                <span class="control-dropdown-extended-popup-title">Choose an option</span>
+                <button class="close-button-inline" domonclick="this.attributes.open = false"></button>
+            </div>
+            <div class="control-dropdown-extended-popup-body">
+                <ooml-substitution property="options" class="Control.DropDown.Extended.Option" array dispatchonclick="
+                    if (this.attributes.selectedOption != data.option) {
+                        this.value = data.option;
+                    }
+                    this.attributes.open = false;
+                "></ooml-substitution>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template ooml-class="Control.Checkbox">
+    <ooml-property name="checked" type="boolean" change="this.$checkbox.checked = value; dispatch('change')">false</ooml-property>
+
+    <ooml-method name="serialise">
+        function() {
+            return this.checked;
+        }
+    </ooml-method>
+
+    <ooml-method name="unserialise">
+        function(boolean checked) {
+            return {
+                checked: checked,
+            };
+        }
+    </ooml-method>
+
+    <input type="checkbox" ooml-expose="checkbox" domonchange="this.checked = $self.checked">
+</template>
+
+<template ooml-class="Control.TextArea.Seamless">
+    <ooml-attribute name="placeholder" type="string">""</ooml-attribute>
+    <ooml-attribute name="fontSize" type="natural">16</ooml-attribute>
+
+    <ooml-property name="value" type="string" change="this.$textarea.value = value; dispatch('change')">""</ooml-property>
+
+    <ooml-method name="resize">
+        function() {
+            this.$textarea.style.height = 'auto';
+            this.$textarea.style.height = this.$textarea.scrollHeight + 16 + 'px'; // padding
+        }
+    </ooml-method>
+
+    <ooml-method name="serialise">
+        function() {
+            return this.value;
+        }
+    </ooml-method>
+    <ooml-method name="unserialise">
+        function(val) {
+            return {
+                value: val,
+            };
+        }
+    </ooml-method>
+
+    <textarea ooml-expose="textarea" class="control-textarea-seamless" placeholder="{{ this.attributes.placeholder }}"
+              ooml-style="font-size: {{ this.attributes.fontSize }}px"
+              domonchange="this.value = $self.value.trim(); this.resize"
+              domoninput="this.resize()"
+    ></textarea>
+</template>
+
+<template ooml-class="Control.Input.TrimmableText">
+    <ooml-attribute name="small" type="boolean" change="this.$input.classList.toggle('small', value)">false</ooml-attribute>
+    <ooml-attribute name="color" type="string" change="this.$input.style.color = value">""</ooml-attribute>
+
+    <ooml-property name="value" type="string" change="this.$input.value = value; dispatch('change')">""</ooml-property>
+
+    <ooml-method name="serialise">
+        function() {
+            return this.value;
+        }
+    </ooml-method>
+    <ooml-method name="unserialise">
+        function(val) {
+            return {
+                value: val,
+            };
+        }
+    </ooml-method>
+
+    <input ooml-expose="input" class="input-plain block" placeholder="Required" domonchange="this.value = $self.value.trim()">
+</template>
+
+<template ooml-class="Control.Input.TrimmableText.Optional">
+    <ooml-attribute name="small" type="boolean" change="this.$input.classList.toggle('small', value)">false</ooml-attribute>
+    <ooml-attribute name="color" type="string" change="this.$input.style.color = value">""</ooml-attribute>
+
+    <ooml-property name="value" type="string" change="this.$input.value = value; dispatch('change')">""</ooml-property>
+
+    <ooml-method name="serialise">
+        function() {
+            return this.value || undefined;
+        }
+    </ooml-method>
+    <ooml-method name="unserialise">
+        function(val) {
+            return {
+                value: val,
+            };
+        }
+    </ooml-method>
+
+    <input ooml-expose="input" class="input-plain block" placeholder="Inactive" domonchange="this.value = $self.value.trim()">
+</template>
+
+<template ooml-class="Control.Input.Integer">
+    <ooml-attribute name="small" type="boolean" change="this.$input.classList.toggle('small', value)">false</ooml-attribute>
+    <ooml-attribute name="arrows" type="boolean" change="this.$input.classList.toggle('no-arrows', !value)">true</ooml-attribute>
+    <ooml-attribute name="color" type="string" change="this.$input.style.color = value">""</ooml-attribute>
+
+    <ooml-attribute name="min" type="integer">Number.MIN_SAFE_INTEGER</ooml-attribute>
+    <ooml-attribute name="max" type="integer">Number.MAX_SAFE_INTEGER</ooml-attribute>
+    <ooml-attribute name="step" type="natural">1</ooml-attribute>
+
+    <ooml-property name="value" type="integer" change="this.$input.value = value; dispatch('change')">0</ooml-property>
+
+    <ooml-method name="serialise">
+        function() {
+            return this.value;
+        }
+    </ooml-method>
+    <ooml-method name="unserialise">
+        function(val) {
+            return {
+                value: val,
+            };
+        }
+    </ooml-method>
+
+    <input ooml-expose="input" type="number" min="{{ this.attributes.min }}" max="{{ this.attributes.max }}" step="{{ this.attributes.step }}" class="input-plain block" placeholder="Required" domonchange="this.value = Math.min(this.attributes.max, Math.max(this.attributes.min, Number.parseInt($self.value, 10) || 0))">
+</template>
+
+<template ooml-class="Control.Input.Integer.Optional">
+    <ooml-attribute name="small" type="boolean" change="this.$input.classList.toggle('small', value)">false</ooml-attribute>
+    <ooml-attribute name="arrows" type="boolean" change="this.$input.classList.toggle('no-arrows', !value)">true</ooml-attribute>
+    <ooml-attribute name="color" type="string" change="this.$input.style.color = value">""</ooml-attribute>
+
+    <ooml-attribute name="min" type="integer">Number.MIN_SAFE_INTEGER</ooml-attribute>
+    <ooml-attribute name="max" type="integer">Number.MAX_SAFE_INTEGER</ooml-attribute>
+    <ooml-attribute name="step" type="natural">1</ooml-attribute>
+
+    <ooml-property name="value" type="integer|null" change="this.$input.value = value == null ? '' : value; dispatch('change')">null</ooml-property>
+
+    <ooml-method name="serialise">
+        function() {
+            return this.value == null ? undefined : this.value;
+        }
+    </ooml-method>
+    <ooml-method name="unserialise">
+        function(val) {
+            return {
+                value: val,
+            };
+        }
+    </ooml-method>
+
+    <input ooml-expose="input" type="number" min="{{ this.attributes.min }}" max="{{ this.attributes.max }}" step="{{ this.attributes.step }}" class="input-plain block" placeholder="Inactive" domonchange="
+        let text = $self.value.trim();
+        if (!text) {
+            this.value = null;
+        } else {
+            this.value = Math.min(this.attributes.max, Math.max(this.attributes.min, Number.parseInt(text, 10)));
+        }
+    ">
+</template>
+
+<template ooml-class="Control.Input.RegExp">
+    <ooml-property name="value" type="string" change="this.$input.value = value; dispatch('change')">""</ooml-property>
+
+    <ooml-method name="serialise">
+        function() {
+            return this.value || undefined;
+        }
+    </ooml-method>
+    <ooml-method name="unserialise">
+        function(val) {
+            return {
+                value: val,
+            };
+        }
+    </ooml-method>
+
+    <input ooml-expose="input" class="control-input-regexp input-plain block" placeholder="Inactive" domonchange="this.value = $self.value">
+</template>

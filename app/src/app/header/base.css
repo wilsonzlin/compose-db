@@ -1,0 +1,36 @@
+#header {
+    /*background: #f5f5f5;*/
+    /*border-bottom: 1px solid #e5e5e5;*/
+
+    background: #fafafa;
+    padding: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#header-logo {
+    display: flex;
+    align-items: center;
+}
+
+#header-logo-org {
+    color: #333;
+    font-size: 28px;
+    font-weight: 500;
+    margin-right: 12px;
+}
+
+#header-logo-schema {
+    color: #666;
+    font-size: 16px;
+    font-weight: 300;
+    text-transform: uppercase;
+}
+
+#header-controls > * {
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: middle;
+}

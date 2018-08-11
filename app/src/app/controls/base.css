@@ -1,0 +1,127 @@
+.control-dropdown-extended-option {
+    cursor: pointer;
+    padding: 8px 8px 8px 30px;
+    border-bottom: 1px solid #eee;
+
+    line-height: 1.5;
+
+    position: relative; /* For tick */
+}
+
+.control-dropdown-extended-option:hover {
+    background: #4078c0;
+}
+    .control-dropdown-extended-option:hover::before,
+    .control-dropdown-extended-option:hover > * {
+        color: white !important;
+    }
+
+.control-dropdown-extended-option-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+}
+
+.control-dropdown-extended-option-description {
+    font-size: 12px;
+    color: #767676;
+    white-space: pre-line;
+}
+
+.control-dropdown-extended-option[data-selected="true"]::before {
+    content: '\2713';
+    font-size: 20px;
+    color: #333;
+
+    position: absolute;
+    top: 3px;
+    left: 9px;
+}
+
+.control-dropdown-extended-option[data-selected="true"] .control-dropdown-extended-option-name {
+    color: #333;
+}
+
+.control-dropdown-extended-option[data-selected="true"] .control-dropdown-extended-option-description {
+    color: #666;
+}
+
+.control-dropdown-extended-button:empty::before {
+    content: 'No option chosen';
+    color: #999;
+}
+
+.control-dropdown-extended-container {
+    position: relative;
+}
+
+.control-dropdown-extended-popup {
+    display: none;
+
+    position: absolute;
+    top: calc(100% + 4px);
+    /*left: 0;*/
+    /*right: 0;*/
+
+    background: white;
+    border: 1px solid rgba(200, 200, 200, 0.4);
+    border-radius: 3px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+
+    width: 300px;
+    z-index: 10;
+}
+
+.control-dropdown-extended-container[data-open="true"] > .control-dropdown-extended-popup {
+    display: block;
+}
+
+.control-dropdown-extended-popup-head {
+    background: #f5f5f5;
+    padding: 8px 10px;
+    line-height: 16px;
+
+    border-bottom: 1px solid #e5e5e5;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.control-dropdown-extended-popup-title {
+    color: #333;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.control-dropdown-extended-popup-body:empty::before {
+    content: 'No options available';
+    display: block;
+    text-align: center;
+    padding: 32px;
+    font-size: 18px;
+    background: #fafafa;
+    color: #666;
+}
+
+.control-textarea-seamless {
+    border: 0;
+    padding: 8px;
+
+    resize: none;
+
+    display: block;
+    width: 100%;
+}
+
+input.no-arrows::-webkit-outer-spin-button, input.no-arrows::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input.no-arrows {
+    -moz-appearance: textfield;
+}
+
+.control-input-regexp {
+    color: blue;
+}

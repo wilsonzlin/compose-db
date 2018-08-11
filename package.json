@@ -1,0 +1,40 @@
+{
+  "name": "compose-db",
+  "version": "0.0.1",
+  "description": "Relational database schema builder web app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wilsonzlin/schema.git"
+  },
+  "author": {
+    "email": "contact@wilsonl.in",
+    "name": "Wilson Lin",
+    "url": "https://wilsonl.in/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wilsonzlin/schema/issues"
+  },
+  "homepage": "https://github.com/wilsonzlin/schema#readme",
+  "dependencies": {
+    "body-parser": "1.x",
+    "diff": "3.x",
+    "express": "4.x",
+    "fs-extra": "^2.1.2",
+    "luamin": "^1.0.4",
+    "minimist": "^1.2.0",
+    "ooml": "13.x",
+    "sprintf-js": "^1.0.3"
+  },
+  "devDependencies": {
+    "zcompile": "4.x"
+  },
+  "keywords": [
+    "schema",
+    "builder",
+    "relational",
+    "database",
+    "db",
+    "sql"
+  ]
+}
