@@ -2,6 +2,9 @@
   "name": "compose-db",
   "version": "0.0.1",
   "description": "Relational database schema builder web app",
+  "files": [
+    "dist/**"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wilsonzlin/schema.git"
